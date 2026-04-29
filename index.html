@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="ico.jpg" type="image/png">
+  <title>MARCA ED | Registro de clientes</title>
+  <link rel="stylesheet" href="estilo_mejorado.css" />
+</head>
+<body>
+  <section class="hero" id="hero">
+    <div class="hero-content" style="max-width: 720px; width: 100%;">
+      <span class="hero-tag">Bienvenido</span>
+      <h1>Registro de clientes</h1>
+      <p>Completa los datos del cliente para ingresar al sistema y continuar hacia la tienda.</p>
+
+      <article class="panel" style="margin-top: 24px;">
+        <form id="formCliente" class="modern-form">
+          <div class="field-group">
+            <label for="nombre">Nombre</label>
+            <input type="text" id="nombre" placeholder="Ej: Laura Gómez" required />
+          </div>
+
+          <div class="field-group">
+            <label for="telefono">Teléfono</label>
+            <input type="text" id="telefono" placeholder="Ej: 3001234567" />
+          </div>
+
+          <div class="field-group">
+            <label for="direccion">Dirección</label>
+            <input type="text" id="direccion" placeholder="Ej: Calle 12 #10-20" />
+          </div>
+
+          <button type="submit" class="btn submit-btn">Enviar</button>
+        </form>
+
+        <p id="mensaje" class="form-message"></p>
+      </article>
+    </div>
+  </section>
+
+  <script>
+    const API = "http://localhost:3000/api";
+
+    document.getElementById("formCliente").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const datos = {
+        nombre: document.getElementById("nombre").value.trim(),
+        telefono: document.getElementById("telefono").value.trim(),
+        direccion: document.getElementById("direccion").value.trim()
+      };
+
+      const mensaje = document.getElementById("mensaje");
+      mensaje.textContent = "Guardando cliente...";
+      mensaje.className = "form-message pending";
+
+      try {
+        const respuesta = await fetch(`${API}/clientes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(datos)
+        });
+
+        const resultado = await respuesta.json();
+
+        if (respuesta.ok) {
+          mensaje.textContent = resultado.mensaje || "Cliente guardado correctamente.";
+          mensaje.className = "form-message ok";
+          setTimeout(() => {
+            window.location.href = "tienda.html";
+          }, 700);
+        } else {
+          mensaje.textContent = resultado.error || "Ocurrió un error al guardar.";
+          mensaje.className = "form-message error";
+        }
+      } catch (error) {
+        console.error("Error al guardar cliente:", error);
+        mensaje.textContent = "No se pudo conectar con el servidor.";
+        mensaje.className = "form-message error";
+      }
+    });
+  </script>
+</body>
+</html>
